@@ -3,16 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const bodyObj = document.querySelector('body');
 
     async function pokeDisplay() {
-        // Fetch a la PokeAPI
-        const response = await fetch(POKE_URL);
-        console.log(response);
-        const data = await response.json();
-
         //Crear el div principal con clase main
         const mainDiv = document.createElement('div');
         mainDiv.className = 'main';
         bodyObj.appendChild(mainDiv);
 
+        // Crear el titulo
         const title = document.createElement('h1');
         title.className = 'pokeTitle';
         title.textContent = 'Pokémon API';
@@ -24,9 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Bucle para filas y celdas
         for(let i = 0; i < 2; i++){
             const row = document.createElement('tr');
-            console.log("Creating row");
             for(let j = 0; j < 5; j++){
-                console.log("Creating cell");
                 const single = document.createElement('td');
                 row.appendChild(single);
 
@@ -50,11 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const but = document.createElement('button');
                 but.className = 'pokeBut';
                 but.textContent = 'Detall';
+                but.setAttribute('data-pokemon', dataPoke.name);
                 single.appendChild(but);
             }
             table.appendChild(row);
         }
         mainDiv.appendChild(table);
     }
+    
+    async function buttonClick(){
+        const buttonDetall = document.querySelector('.pokeBut');
+        buttonDetall.addEventListener('click', async function(){
+            window.location.href = `pokemon.html?url=${POKE_URL}/${buttonDetall.getAttribute('data-pokemon')}`;
+        });
+    }
     pokeDisplay();
+    buttonClick();
 });
