@@ -1,0 +1,18 @@
+.pokeTable{
+    width: 100%;
+    text-align: center;
+    border: 1px solid black;
+    padding-left: 50px;
+    padding-right: 50px;
+    border-spacing: 15px;
+}
+.pokeTable td{
+    border: 1px solid lightgrey;
+    border-radius: 10pt;
+    border-top: none;
+    border-bottom: none;
+    height: 250px;
+}
+.pokeImg{
+    width: 100px;
+}
