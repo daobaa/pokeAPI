@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Crear botón de volver atrás con respecto al historial
         const goback = document.createElement('button');
         goback.className = 'pokeBut';
-        goback.textContent = 'Tornar enrere';
+        goback.textContent = '⬅ Tornar enrere';
         mainDiv.appendChild(goback);
         goback.addEventListener('click', function(){
             window.history.back();
