@@ -44,20 +44,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const but = document.createElement('button');
                 but.className = 'pokeBut';
                 but.textContent = 'Detall';
-                but.setAttribute('data-pokemon', dataPoke.name);
+                but.setAttribute('data-pokemon', dataPoke.id);
                 single.appendChild(but);
+
+                but.addEventListener('click', function(){
+                    window.location.href = `pokemon.html?id=${dataPoke.id}`;
+                });
             }
             table.appendChild(row);
         }
         mainDiv.appendChild(table);
     }
-    
-    async function buttonClick(){
-        const buttonDetall = document.querySelector('.pokeBut');
-        buttonDetall.addEventListener('click', async function(){
-            window.location.href = `pokemon.html?url=${POKE_URL}/${buttonDetall.getAttribute('data-pokemon')}`;
-        });
-    }
     pokeDisplay();
-    buttonClick();
 });
