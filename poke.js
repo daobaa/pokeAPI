@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', function() {
         mainDiv.className = 'main';
         bodyObj.appendChild(mainDiv);
 
+        const title = document.createElement('h1');
+        title.className = 'pokeTitle';
+        title.textContent = 'Pokémon API';
+        mainDiv.appendChild(title);
+
         // Crear la tabla
         const table = document.createElement('table');
         table.className = 'pokeTable';

@@ -1,3 +1,9 @@
+*{
+    font-family: 'Arial', sans-serif;
+}
+.pokeTitle{
+    text-align: center;
+}
 .pokeTable{
     width: 100%;
     text-align: center;
