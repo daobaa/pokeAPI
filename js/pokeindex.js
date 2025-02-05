@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const POKE_URL = 'https://pokeapi.co/api/v2/pokemon';
     const bodyObj = document.querySelector('body');
     let selectedNum = 10;
+    let offset = 0;
+    const LIMIT = 10;
+    let currentPage = 1;
 
     async function pokeDisplay() {
         //Crear el div principal con clase main
@@ -33,13 +36,48 @@ document.addEventListener('DOMContentLoaded', function() {
             table.innerHTML = '';
             await createTable(selectedNum, table);
         });
+
+        // Crear botón Previous
+        const prevBut = document.createElement('button');
+        prevBut.textContent = 'Prev';
+        prevBut.className = 'prevBut';
+        prevBut.disabled = true;
+        mainDiv.appendChild(prevBut);
+
+        prevBut.addEventListener('click', async () =>{
+            offset -= LIMIT;
+            currentPage--;
+            table.innerHTML = '';
+            await createTable(selectedNum, table);
+            updateButtonState();
+        });
+
+        // Crear botón Next
+        const nextBut = document.createElement('button');
+        nextBut.textContent = 'Next';
+        nextBut.className = 'nextBut';
+        mainDiv.appendChild(nextBut);
+        
+        nextBut.addEventListener('click', async () =>{
+            offset += LIMIT;
+            currentPage++;
+            table.innerHTML = '';
+            await createTable(selectedNum, table);
+            updateButtonState();
+        });
+        function updateButtonState(){
+            prevBut.disabled = currentPage === 1;
+            nextBut.disabled = false;
+        }
+        await createTable(offset, LIMIT, table);
+        updateButtonState();
     }
 
     async function selectDropdown(dropSelect) {
         // Crear label para el select de numero de tarjetas
         const txtNum = document.createElement('label');
         txtNum.className = 'txtNum';
-        txtNum.setAttribute('for', 'num');
+        txtNum.setAttribute('for', 'numSelect');
         txtNum.textContent = 'Numero de resultats:';
         dropSelect.appendChild(txtNum);
 
@@ -62,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function createTable(numCells, table){
         const numRows = Math.ceil(numCells / 5);
-        console.log(`Creating table with ${numCells} cells, which will be split into ${numRows} rows`);
 
         // Bucle para filas y celdas
         for(let i = 0; i < numRows; i++){
@@ -72,31 +109,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(single);
 
                 // Fetch a la API de cada pokemon
-                const result = await fetch(POKE_URL + '/' + (i*5 + j + 1));
+                const result = await fetch(`${POKE_URL}?offset=${offset + i * 5 + j}&limit=${LIMIT}`);
                 const dataPoke = await result.json()
-                console.log(dataPoke);
+                console.log('Fetched dataPoke:', dataPoke);
 
-                // Crear imagen de cada pokemon
-                const img = document.createElement('img');
-                img.className = 'pokeImg';
-                img.src = dataPoke.sprites.front_default;
-                single.appendChild(img);
+                if(dataPoke.results && dataPoke.results[j]){
+                    const pokemonUrl = dataPoke.results[j].url;
+                    console.log('Fetched details from URL:', pokemonUrl);
 
-                // Crear nombre de cada pokemon
-                const name = document.createElement('h3');
-                name.textContent = dataPoke.name;
-                single.appendChild(name);
+                    const pokeDetails = await fetch(pokemonUrl);
+                    const pokeData = await pokeDetails.json();
 
-                // Crear botón
-                const but = document.createElement('button');
-                but.className = 'pokeBut';
-                but.textContent = 'Detall';
-                but.setAttribute('data-pokemon', dataPoke.id);
-                single.appendChild(but);
+                    console.log('Fetched pokeData:', pokeData);
 
-                but.addEventListener('click', function(){
-                    window.location.href = `pokemon.html?id=${dataPoke.id}`;
-                });
+                    // Crear imagen de cada pokemon
+                    const img = document.createElement('img');
+                    img.className = 'pokeImg';
+                    img.src = pokeData.sprites.front_default;
+                    single.appendChild(img);
+
+                    // Crear nombre de cada pokemon
+                    const name = document.createElement('h3');
+                    name.textContent = pokeData.name;
+                    single.appendChild(name);
+
+                    // Crear botón
+                    const but = document.createElement('button');
+                    but.className = 'pokeBut';
+                    but.textContent = 'Detall';
+                    but.setAttribute('data-pokemon', pokeData.id);
+                    single.appendChild(but);
+
+                    but.addEventListener('click', function(){
+                        window.location.href = `pokemon.html?id=${pokeData.id}`;
+                    });
+                } else{
+                    console.error('No Pokemon data found for:', dataPoke.results[j]);
+                }
             }
             table.appendChild(row);
         }
