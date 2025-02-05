@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         abHeader.textContent = 'Habilitat';
         headerRow.appendChild(abHeader);
         abTable.appendChild(headerRow);
+        
         // Bucle para filas y celdas
         for (let i = 0; i < dataPoke.abilities.length; i++) {
             const row = document.createElement('tr');
