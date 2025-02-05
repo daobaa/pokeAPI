@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const bodyObj = document.querySelector('body');
     let selectedNum = 10;
     let offset = 0;
+    let currentOffset = 0;
     const LIMIT = 10;
     let currentPage = 1;
 
@@ -32,9 +33,12 @@ document.addEventListener('DOMContentLoaded', function() {
         await createTable(selectedNum, table);
 
         dropSelect.querySelector('#numSelect').addEventListener('change', async function(e){
-            selectedNum = e.target.value;
+            selectedNum = parseInt(e.target.value);
+            currentOffset = 0;
+            currentPage = 1;
             table.innerHTML = '';
             await createTable(selectedNum, table);
+            updateButtonState();
         });
 
         // Crear botón Previous
@@ -45,8 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mainDiv.appendChild(prevBut);
 
         prevBut.addEventListener('click', async () =>{
-            offset -= LIMIT;
             currentPage--;
+            currentOffset -= selectedNum;
             table.innerHTML = '';
             await createTable(selectedNum, table);
             updateButtonState();
@@ -59,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mainDiv.appendChild(nextBut);
         
         nextBut.addEventListener('click', async () =>{
-            offset += LIMIT;
             currentPage++;
+            currentOffset += selectedNum;
             table.innerHTML = '';
             await createTable(selectedNum, table);
             updateButtonState();
@@ -99,18 +103,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function createTable(numCells, table){
-        const numRows = Math.ceil(numCells / 5);
-
-        const pokemonIds = [];
-        for(let i = 0; i < numCells; i++){
-            pokemonIds.push(offset + i + 1);
-        }
         const pokemonData = [];
-        for(let id of pokemonIds){
-            const result = await fetch(`${POKE_URL}/${id}`);
+        for(let i = 0; i < numCells; i++){
+            const pokemonId = currentOffset + i + 1;
+            const result = await fetch(`${POKE_URL}/${pokemonId}`);
             const dataPoke = await result.json();
             pokemonData.push(dataPoke);
         }
+
+        table.innerHTML = '';
+
+        const numRows = Math.ceil(numCells / 5);
 
         // Bucle para filas y celdas
         for(let i = 0; i < numRows; i++){
@@ -118,6 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
             for(let j = 0; j < 5 && (i * 5 + j) < numCells; j++){
                 const single = document.createElement('td');
                 row.appendChild(single);
+
+                const pokeData = pokemonData[i * 5 + j];
                 
                 // Crear imagen de cada pokemon
                 const img = document.createElement('img');
