@@ -101,51 +101,45 @@ document.addEventListener('DOMContentLoaded', function() {
     async function createTable(numCells, table){
         const numRows = Math.ceil(numCells / 5);
 
+        const pokemonIds = [];
+        for(let i = 0; i < numCells; i++){
+            pokemonIds.push(offset + i + 1);
+        }
+        const pokemonData = [];
+        for(let id of pokemonIds){
+            const result = await fetch(`${POKE_URL}/${id}`);
+            const dataPoke = await result.json();
+            pokemonData.push(dataPoke);
+        }
+
         // Bucle para filas y celdas
         for(let i = 0; i < numRows; i++){
             const row = document.createElement('tr');
             for(let j = 0; j < 5 && (i * 5 + j) < numCells; j++){
                 const single = document.createElement('td');
                 row.appendChild(single);
-
-                // Fetch a la API de cada pokemon
-                const result = await fetch(`${POKE_URL}?offset=${offset + i * 5 + j}&limit=${LIMIT}`);
-                const dataPoke = await result.json()
-                console.log('Fetched dataPoke:', dataPoke);
-
-                if(dataPoke.results && dataPoke.results[j]){
-                    const pokemonUrl = dataPoke.results[j].url;
-                    console.log('Fetched details from URL:', pokemonUrl);
-
-                    const pokeDetails = await fetch(pokemonUrl);
-                    const pokeData = await pokeDetails.json();
-
-                    console.log('Fetched pokeData:', pokeData);
-
-                    // Crear imagen de cada pokemon
-                    const img = document.createElement('img');
-                    img.className = 'pokeImg';
-                    img.src = pokeData.sprites.front_default;
-                    single.appendChild(img);
-
-                    // Crear nombre de cada pokemon
-                    const name = document.createElement('h3');
-                    name.textContent = pokeData.name;
-                    single.appendChild(name);
-
-                    // Crear botón
-                    const but = document.createElement('button');
-                    but.className = 'pokeBut';
-                    but.textContent = 'Detall';
-                    but.setAttribute('data-pokemon', pokeData.id);
-                    single.appendChild(but);
-
-                    but.addEventListener('click', function(){
-                        window.location.href = `pokemon.html?id=${pokeData.id}`;
-                    });
-                } else{
-                    console.error('No Pokemon data found for:', dataPoke.results[j]);
-                }
+                
+                // Crear imagen de cada pokemon
+                const img = document.createElement('img');
+                img.className = 'pokeImg';
+                img.src = pokemonData[i * 5 + j].sprites.front_default;
+                single.appendChild(img);
+                
+                // Crear nombre de cada pokemon
+                const name = document.createElement('h3');
+                name.textContent = pokemonData[i * 5 + j].name;
+                single.appendChild(name);
+                
+                // Crear botón
+                const but = document.createElement('button');
+                but.className = 'pokeBut';
+                but.textContent = 'Detall';
+                but.setAttribute('data-pokemon', pokemonData[i * 5 + j].id);
+                single.appendChild(but);
+                
+                but.addEventListener('click', function(){
+                    window.location.href = `pokemon.html?id=${pokeData.id}`;
+                });
             }
             table.appendChild(row);
         }
